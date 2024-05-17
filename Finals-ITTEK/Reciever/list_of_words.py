@@ -30,7 +30,7 @@ finance_related_text = [
     "Jun",
     "Jul"
 ]
-
+#Nr. of words = 30
 
 non_finance_related_text = [
     "Weather",
@@ -63,3 +63,4 @@ non_finance_related_text = [
     "Oh yes i love the different cultues around the world",
     "This weekend i am going to visit my mother"
 ]
+#Nr. of words = 29

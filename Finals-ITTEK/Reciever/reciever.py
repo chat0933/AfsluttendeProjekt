@@ -1,6 +1,3 @@
-"""
-OVERVEJ LIGE AT BRUG ZMQ HVOR BESKEDEN ER VARIABLEN = NÅR DER BLIVER SENDT EN FIL / TILFØJET EN NY FIL
-"""
 import zmq
 import os
 
@@ -9,14 +6,18 @@ def receive_files(folder_path):
     socket = context.socket(zmq.PULL)
     socket.bind("tcp://*:5555")  # Listen on all interfaces
 
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
     while True:
-        # Receive file name, extension, and data
+        # Receive file name and data
         file_info, data = socket.recv_multipart()
-        file_name, file_extension = file_info.decode().split('|')
+        file_name = file_info.decode()
 
         file_path = os.path.join(folder_path, file_name)
 
-        with open(file_path + file_extension, 'wb') as f:
+        # Write the data to the file without appending the extension again
+        with open(file_path, 'wb') as f:
             f.write(data)
 
 def main():

@@ -1,2 +1,15 @@
 
 /Finals-ITTEK/Reciever/old_files
+Finals-ITTEK/main.py
+Finals-ITTEK/Reciever/fine_tuned_model/model.safetensors
+Finals-ITTEK/Reciever/fine_tuned_model/tokenizer_config.json
+Finals-ITTEK/Reciever/fine_tuned_model/vocab.txt
+Finals-ITTEK/Sender/Files_to_send/Chrsitan_ExamsensForberedelse1Semester.docx
+Finals-ITTEK/Sender/Files_to_send/Dengodestudiegruppe-forventningsafstemningGruppe-A1.docx
+Finals-ITTEK/Sender/sender_old.py
+Finals-ITTEK/Sender/Files_to_send/wordDokumentTtESET.docx
+Finals-ITTEK/main.py
+Finals-ITTEK/Reciever/classifier_med_udregning.py
+Finals-ITTEK/Reciever/create_model_with_notes.py
+Finals-ITTEK/Reciever/fine_tuned_model/config.json
+Finals-ITTEK/Reciever/fine_tuned_model/special_tokens_map.json

@@ -30,7 +30,7 @@ model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_l
 # Define optimizer and loss function
 optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5) #AdamW adjusts weights, lr 0.000005, small adjustment for finetuning
 
-#Create the training and testing datasets. Zip = samler, dictionary ["Jimmy": 20]
+#Create the training and testing datasets. Zip = samler
 train_data = [{'input_ids': torch.tensor(encoding), 'attention_mask': torch.tensor(attention_mask), 'labels': label}
               for encoding, attention_mask, label in zip(train_encodings['input_ids'], train_encodings['attention_mask'], train_labels)]
 

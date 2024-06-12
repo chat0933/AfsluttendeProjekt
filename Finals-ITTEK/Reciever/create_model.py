@@ -17,29 +17,29 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(pos_and_ne
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased') #uncased = converts everything to lowercase 
 
 # Tokenize the text data
-train_encodings = tokenizer(train_texts, truncation=True, padding=True)
-test_encodings = tokenizer(test_texts, truncation=True, padding=True)
+train_encodings = tokenizer(train_texts, truncation=True, padding=True) # padding adds 0, att_mask ? is 1 / 0. input_ids = num token 
+test_encodings = tokenizer(test_texts, truncation=True, padding=True) #ditto
 
 # Convert labels to tensors
-train_labels = torch.tensor(train_labels)
+train_labels = torch.tensor(train_labels) #Effektivt til computation (GPU)
 test_labels = torch.tensor(test_labels)
 
 # Load pre-trained BERT model for sequence classification
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
 # Define optimizer and loss function
-optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)
+optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5) #AdamW adjusts weights, lr 0.000005, small adjustment for finetuning
 
-#Create the training and testing datasets as lists of dictionaries
+#Create the training and testing datasets. Zip = samler, dictionary ["Jimmy": 20]
 train_data = [{'input_ids': torch.tensor(encoding), 'attention_mask': torch.tensor(attention_mask), 'labels': label}
               for encoding, attention_mask, label in zip(train_encodings['input_ids'], train_encodings['attention_mask'], train_labels)]
 
 test_data = [{'input_ids': torch.tensor(encoding), 'attention_mask': torch.tensor(attention_mask), 'labels': label}
              for encoding, attention_mask, label in zip(test_encodings['input_ids'], test_encodings['attention_mask'], test_labels)]
 
-# Create DataLoader for training and testing data
-train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=8, shuffle=True)
-test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=8, shuffle=False)
+# Create DataLoader for training and testing data, batches. convert to tensor
+train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=8, shuffle=True) # shuffle is fine
+test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=8, shuffle=False) # Dont shuffle
 
 
 def train_and_create_model():
@@ -47,31 +47,31 @@ def train_and_create_model():
     model.train()
     for epoch in range(3):  # Amount of times the model gets trained / go through the data set
         for batch in train_dataloader:
-            optimizer.zero_grad()
-            input_ids = batch['input_ids']
-            attention_mask = batch['attention_mask']
-            labels = batch['labels']
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss
-            loss.backward()
-            optimizer.step()
+            optimizer.zero_grad() # Clears gradients
+            input_ids = batch['input_ids'] # numeral tokens
+            attention_mask = batch['attention_mask'] #What is padding
+            labels = batch['labels'] # 0 or 1
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels) #process input, predict / sammenlign labels
+            loss = outputs.loss # Incorrect predictions / how bad
+            loss.backward() #calculates how each weight should be adjusted 
+            optimizer.step() # ueses lr and gradients to optimize
 
     # Evaluation
     model.eval()
     predictions = []
     true_labels = []
     for batch in test_dataloader:
-        with torch.no_grad():
-            input_ids = batch['input_ids']
-            attention_mask = batch['attention_mask']
-            labels = batch['labels']
-            outputs = model(input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
-            predictions.extend(logits.argmax(dim=-1).cpu().numpy()) #Predicted labels
-            true_labels.extend(labels.cpu().numpy()) # True labels
+        with torch.no_grad(): # Gradients anvendes ikke, context manager 
+            input_ids = batch['input_ids'] # Numeral tokens
+            attention_mask = batch['attention_mask'] # What is padding
+            labels = batch['labels'] # 0 or 1
+            outputs = model(input_ids, attention_mask=attention_mask) #passed to model
+            logits = outputs.logits #raw scores extraced
+            predictions.extend(logits.argmax(dim=-1).cpu().numpy()) #Predicted labels, 1 dim =[1,2,3], argmax converts raw score
+            true_labels.extend(labels.cpu().numpy()) # True labels, converts to numpy array
 
     # Calculate accuracy
-    accuracy = accuracy_score(true_labels, predictions)
+    accuracy = accuracy_score(true_labels, predictions) # Preiction / True labels = %
     print("Accuracy:", accuracy)
 
     # Save the trained model
